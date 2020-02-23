@@ -20,12 +20,64 @@ package space.arim.mobstacker.api;
 
 import org.bukkit.entity.Entity;
 
-import space.arim.universal.util.lang.AutoClosable;
+import space.arim.universal.util.AutoClosable;
 
+/**
+ * The officially supported API for interacting with MobStackerReloaded.
+ * 
+ * @author A248
+ *
+ */
 public interface MobStackerAPI extends AutoClosable {
 	
+	/**
+	 * Returns the stack amount of an entity. <br>
+	 * <br>
+	 * <b>If the entity cannot be stacked</b>, <code>0</code> is returned.
+	 * 
+	 * @param entity the entity
+	 * @return the amount
+	 */
+	int getAmount(Entity entity);
+	
+	/**
+	 * Updates the stack amount of an entity. <br>
+	 * If the entity cannot be stacked according to {@link #isStackable(Entity)}, nothing happens.
+	 * 
+	 * @param entity the entity to change 
+	 * @param amount the updated amount
+	 */
+	void setAmount(Entity entity, int amount);
+	
+	/**
+	 * Attempts to merge an entity into surrounding entities.
+	 * 
+	 * @param entity the entity to merge
+	 * @param cause the StackCause, use StackCause.PLUGIN
+	 */
+	void attemptMerges(Entity entity, StackCause cause);
+	
+	/**
+	 * Checks if the entity is stacked
+	 * 
+	 * @param entity the entity to check
+	 * @return true if and only if the entity is a stacked entity
+	 */
 	boolean isStacked(Entity entity);
 	
+	/**
+	 * Checks whether an entity may ever be stacked.
+	 * Nonliving entities, players, and entity types filtered in the config.yml cannot be stacked.
+	 * 
+	 * @param entity the entity to check
+	 * @return true if and only if the entity is included in possible future stacking
+	 */
 	boolean isStackable(Entity entity);
+	
+	/**
+	 * Reloads MobStacker configuration
+	 * 
+	 */
+	void reload();
 	
 }
