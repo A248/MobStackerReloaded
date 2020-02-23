@@ -22,6 +22,8 @@ public enum StackCause {
 
 	SPAWN,
 	CHUNK_LOAD,
+	PERIODIC,
+	PLUGIN,
 	UNKNOWN;
 	
 }
