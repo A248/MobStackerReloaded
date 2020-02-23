@@ -19,20 +19,31 @@
 package space.arim.mobstacker.api;
 
 import org.bukkit.entity.Entity;
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 
-/**
- * An interface for all stacking related events.
- * 
- * @author A248
- *
- */
-public interface StackEvent {
+public class StackDeathEvent extends Event implements StackEvent {
+
+	private static final HandlerList HANDLERS = new HandlerList();
 	
-	/**
-	 * The entity which represents the entire stack.
-	 * 
-	 * @return the stack entity
-	 */
-	public Entity getStackEntity();
+	private final Entity stack;
 	
+	public StackDeathEvent(Entity stack) {
+		this.stack = stack;
+	}
+	
+	@Override
+	public Entity getStackEntity() {
+		return stack;
+	}
+	
+	@Override
+	public HandlerList getHandlers() {
+		return HANDLERS;
+	}
+	
+	public static HandlerList getHandlerList() {
+		return HANDLERS;
+	}
+
 }
