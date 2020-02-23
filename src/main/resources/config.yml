@@ -1,0 +1,31 @@
+enable-plugin: false
+stacking:
+  max-stack-size: 64
+  mob-spawners-only: true
+  radius:
+    x: 3
+    y: 3
+    z: 3
+  separation:
+    age:
+      enable: true
+      strict: false
+  names:
+    enable: true
+    name: '[%COUNT%] %TYPE%'
+  exempt:
+    use-as-whitelist: false
+    types:
+      - 'VILLAGER'
+triggers:
+  per-world:
+    use-as-whitelist: true
+    worlds:
+      - 'Factions'
+  events:
+    spawn: true
+    chunk-load: true
+  periodic:
+    enable: false
+    period: 6
+do-not-touch-version: 1
