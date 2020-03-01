@@ -125,13 +125,6 @@ public class MobStacker implements MobStackerAPI {
 	
 	void copyAttributes(Entity entity, Entity progeny) {
 		progeny.setTicksLived(entity.getTicksLived());
-		progeny.setSilent(entity.isSilent());
-		for (Entity passenger : entity.getPassengers()) {
-			progeny.addPassenger(passenger);
-		}
-		for (String tag : entity.getScoreboardTags()) {
-			progeny.addScoreboardTag(tag);
-		}
 	}
 	
 	private boolean mergeable(LivingEntity entity, LivingEntity other) {
