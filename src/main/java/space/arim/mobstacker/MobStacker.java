@@ -39,7 +39,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import space.arim.universal.util.erringfunction.ErringConsumer;
+import space.arim.universal.util.function.ErringConsumer;
 
 import space.arim.api.util.FilesUtil;
 import space.arim.api.util.LazySingleton;

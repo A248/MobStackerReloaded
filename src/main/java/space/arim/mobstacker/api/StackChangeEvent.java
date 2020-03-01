@@ -21,7 +21,7 @@ package space.arim.mobstacker.api;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.HandlerList;
 
-import space.arim.api.server.bukkit.CancellableEvent;
+import space.arim.api.platform.spigot.CancellableEvent;
 
 public class StackChangeEvent extends CancellableEvent implements StackEvent {
 
