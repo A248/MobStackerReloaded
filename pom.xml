@@ -16,7 +16,7 @@
     	<maven.compiler.target>1.8</maven.compiler.target>
     	<core.version>0.1.0</core.version>
 		<arimapi.version>0.7.0-SNAPSHOT</arimapi.version>
-    	<universal.version>0.6.8-SNAPSHOT</universal.version>
+    	<universal.version>0.6.9-SNAPSHOT</universal.version>
     	<spigot.version>1.8.8-R0.1-SNAPSHOT</spigot.version>
     	<bstats.version>1.7</bstats.version>
     </properties>
@@ -63,14 +63,6 @@
 				<configuration>
 					<outputDirectory>${project.build.directory}/shared-resources</outputDirectory>
 					<excludeTransitive>true</excludeTransitive>
-					<artifactItems>
-						<artifactItem>
-							<groupId>space.arim</groupId>
-							<artifactId>universal-gpl</artifactId>
-							<version>${universal.version}</version>
-							<classifier>resources</classifier>
-						</artifactItem>
-					</artifactItems>
 				</configuration>
 				<executions>
 					<execution>
@@ -81,7 +73,10 @@
 						<phase>generate-resources</phase>
 						<configuration>
 							<includes>LICENSE.txt</includes>
-							<classifier>resources</classifier>
+							<includeGroupIds>space.arim</includeGroupIds>
+							<includeArtifactIds>universal-gpl</includeArtifactIds>
+							<includeScope>provided</includeScope>
+							<includeTypes>zip</includeTypes>
 						</configuration>
 					</execution>
 				</executions>
@@ -141,7 +136,6 @@
 			<groupId>space.arim</groupId>
 			<artifactId>universal-gpl</artifactId>
 			<version>${universal.version}</version>
-			<classifier>resources</classifier>
 			<type>zip</type>
 			<optional>true</optional>
 			<scope>provided</scope>
