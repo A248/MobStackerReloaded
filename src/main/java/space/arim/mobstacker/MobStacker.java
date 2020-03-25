@@ -109,11 +109,25 @@ public class MobStacker implements MobStackerAPI {
 	
 	private void attemptMerge(LivingEntity entity, LivingEntity nearby, StackCause cause) {
 		if (isStackable(nearby) && config.mergeable(entity, nearby)) {
-			int finalAmount = getAmount(entity) + getAmount(nearby);
-			if (finalAmount <= config.getInt("stacking.max-stack-size") && fireStackEvent(entity, nearby, cause)) {
-				updateAmount(entity, finalAmount);
-				amounts.remove(nearby.getUniqueId());
-				nearby.remove();
+			int amountEntity = getAmount(entity);
+			int amountNearby = getAmount(nearby);
+			int finalAmount = amountEntity + amountNearby;
+			if (finalAmount <= config.getInt("stacking.max-stack-size")) {
+				// find which entity is bigger and prioritise it
+				LivingEntity stack;
+				LivingEntity stacked;
+				if (amountEntity >= amountNearby) {
+					stack = entity;
+					stacked = nearby;
+				} else {
+					stack = nearby;
+					stacked = entity;
+				}
+				if (fireStackEvent(stack, stacked, cause)) {
+					updateAmount(stack, finalAmount);
+					amounts.remove(stacked.getUniqueId());
+					stacked.remove();
+				}
 			}
 		}
 	}
