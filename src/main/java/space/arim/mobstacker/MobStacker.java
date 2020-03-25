@@ -76,7 +76,7 @@ public class MobStacker implements MobStackerAPI {
 	
 	@Override
 	public int getAmount(LivingEntity entity) {
-		return amounts.getOrDefault(entity, 0);
+		return amounts.getOrDefault(entity.getUniqueId(), 0);
 	}
 	
 	@Override
@@ -115,7 +115,7 @@ public class MobStacker implements MobStackerAPI {
 	void updateAmount(LivingEntity entity, int amount) {
 		if (config.getBoolean("stacking.names.enable")) {
 			entity.setCustomNameVisible(true);
-			entity.setCustomName(config.getString("stacking.names.name").replace("%COUNT%", Integer.toString(amount + 1)));
+			entity.setCustomName(config.getString("stacking.names.name").replace("%COUNT%", Integer.toString(amount)).replace("%TYPE%", config.toStringEntity(entity.getType())));
 		}
 		amounts.put(entity.getUniqueId(), amount);
 	}
