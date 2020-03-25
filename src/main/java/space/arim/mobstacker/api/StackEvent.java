@@ -19,20 +19,29 @@
 package space.arim.mobstacker.api;
 
 import org.bukkit.entity.Entity;
+import org.bukkit.event.Event;
 
 /**
- * An interface for all stacking related events.
+ * A parent class for all stacking related events.
  * 
  * @author A248
  *
  */
-public interface StackEvent {
+public abstract class StackEvent extends Event {
+	
+	private final Entity entity;
+	
+	StackEvent(Entity entity) {
+		this.entity = entity;
+	}
 	
 	/**
 	 * The entity which represents the entire stack.
 	 * 
 	 * @return the stack entity
 	 */
-	public Entity getStackEntity();
+	public Entity getStackEntity() {
+		return entity;
+	}
 	
 }

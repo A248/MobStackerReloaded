@@ -19,22 +19,14 @@
 package space.arim.mobstacker.api;
 
 import org.bukkit.entity.Entity;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class StackDeathEvent extends Event implements StackEvent {
+public class StackDeathEvent extends StackEvent {
 
 	private static final HandlerList HANDLERS = new HandlerList();
 	
-	private final Entity stack;
-	
 	public StackDeathEvent(Entity stack) {
-		this.stack = stack;
-	}
-	
-	@Override
-	public Entity getStackEntity() {
-		return stack;
+		super(stack);
 	}
 	
 	@Override

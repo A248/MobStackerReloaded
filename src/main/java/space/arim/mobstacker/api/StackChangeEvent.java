@@ -19,27 +19,21 @@
 package space.arim.mobstacker.api;
 
 import org.bukkit.entity.Entity;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 
-import space.arim.api.platform.spigot.CancellableEvent;
-
-public class StackChangeEvent extends CancellableEvent implements StackEvent {
+public class StackChangeEvent extends StackEvent implements Cancellable {
 
 	private static final HandlerList HANDLERS = new HandlerList();
 	
-	private final Entity stack;
 	private final Entity stacked;
 	private final StackCause cause;
+	private volatile boolean cancelled = false;
 	
 	public StackChangeEvent(Entity stack, Entity stacked, StackCause cause) {
-		this.stack = stack;
+		super(stack);
 		this.stacked = stacked;
 		this.cause = cause;
-	}
-	
-	@Override
-	public Entity getStackEntity() {
-		return stack;
 	}
 	
 	/**
@@ -68,5 +62,15 @@ public class StackChangeEvent extends CancellableEvent implements StackEvent {
 	public static HandlerList getHandlerList() {
 		return HANDLERS;
 	}
-
+	
+	@Override
+	public boolean isCancelled() {
+		return cancelled;
+	}
+	
+	@Override
+	public void setCancelled(boolean cancel) {
+		cancelled = cancel;
+	}
+	
 }
