@@ -63,7 +63,7 @@ public class StackConfig extends SimpleConfig {
 	
 	private boolean isEntityTypeAllowed(EntityType type) {
 		List<String> typeList = getStrings("stacking.exempt.types");
-		return getBoolean("stacking.filter.use-as-whitelist") ? typeList.contains(type.name()) : !typeList.contains(type.name());
+		return getBoolean("stacking.exempt.use-as-whitelist") ? typeList.contains(type.name()) : !typeList.contains(type.name());
 	}
 	
 	boolean isTypeStackable(LivingEntity entity) {
