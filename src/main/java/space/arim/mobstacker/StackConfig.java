@@ -38,7 +38,7 @@ public class StackConfig extends SimpleConfig {
 	private double stacking_radiusZ;
 	
 	public StackConfig(File folder) {
-		super(folder, "do-not-touch-version");
+		super(folder, "config.yml", "do-not-touch-version");
 	}
 	
 	@Override
