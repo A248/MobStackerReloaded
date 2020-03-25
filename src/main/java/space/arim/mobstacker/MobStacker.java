@@ -46,7 +46,7 @@ public class MobStacker implements MobStackerAPI {
 	 * 1 not stacked but stackable
 	 * 1+ stacked
 	 */
-	final HashMap<UUID, Integer> amounts;
+	final HashMap<UUID, Integer> amounts = new HashMap<UUID, Integer>();
 	
 	private StackPeriodic periodic;
 	
@@ -55,7 +55,6 @@ public class MobStacker implements MobStackerAPI {
 		dataFile = new File(plugin.getDataFolder(), "stacks.txt");
 		config = new StackConfig(plugin.getDataFolder());
 		listener = new StackListener(this);
-		amounts = new HashMap<UUID, Integer>();
 	}
 	
 	void load() {
@@ -70,16 +69,9 @@ public class MobStacker implements MobStackerAPI {
 				periodic = new StackPeriodic(this);
 				periodic.start();
 			}
+		} else {
+			plugin.getLogger().info("Turn on enable-plugin in the config.yml to enable MobStackerReloaded.");
 		}
-	}
-	
-	private boolean loadDataFile() {
-		return FilesUtil.readLines(dataFile, (line) -> {
-			if (line.contains(":")) {
-				String[] data = line.split(":");
-				amounts.put(UUIDUtil.expandAndParse(data[0]), Integer.parseInt(data[1]));
-			}
-		}, (ex) -> plugin.getLogger().log(Level.WARNING, "Failed to read file " + dataFile.getPath() + "!", ex));
 	}
 	
 	@Override
@@ -150,6 +142,15 @@ public class MobStacker implements MobStackerAPI {
 			periodic.stop();
 			periodic = null;
 		}
+	}
+	
+	private boolean loadDataFile() {
+		return FilesUtil.readLines(dataFile, (line) -> {
+			if (line.contains(":")) {
+				String[] data = line.split(":");
+				amounts.put(UUIDUtil.expandAndParse(data[0]), Integer.parseInt(data[1]));
+			}
+		}, (ex) -> plugin.getLogger().log(Level.WARNING, "Failed to read file " + dataFile.getPath() + "!", ex));
 	}
 	
 	@Override
