@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Ageable;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -76,6 +77,19 @@ public class StackConfig extends SimpleConfig {
 	
 	boolean isCorrectLocation(Location location) {
 		return isCorrectWorld(location.getWorld());
+	}
+	
+	boolean mergeable(LivingEntity entity, LivingEntity other) {
+		if (entity.getType() != other.getType()) {
+			return false;
+		}
+		if (getBoolean("stacking.separation.age.enable") && entity instanceof Ageable) {
+			Ageable age1 = (Ageable) entity;
+			Ageable age2 = (Ageable) other;
+			return (getBoolean("stacking.separation.age.strict")) ? age1.getAge() == age2.getAge()
+					: (age1.isAdult() && age2.isAdult() || !age1.isAdult() && !age2.isAdult());
+		}
+		return true;
 	}
 
 }
