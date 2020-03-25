@@ -18,6 +18,7 @@
  */
 package space.arim.mobstacker;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
@@ -40,20 +41,24 @@ public class StackListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	private void onSpawn(CreatureSpawnEvent evt) {
-		if (core.config.getBoolean("stacking.mob-spawners-only") && evt.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER)) {
-			core.validMobs.get().add(evt.getEntity().getUniqueId());
-		}
-		if (core.config.getBoolean("triggers.events.spawn")) {
-			core.attemptMerges(evt.getEntity(), StackCause.SPAWN);
+		if (evt.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) && core.config.isTypeStackable(evt.getEntity())) {
+			core.amounts.put(evt.getEntity().getUniqueId(), 1);
+			if (core.config.getBoolean("triggers.events.spawn")) {
+				core.attemptMerges(evt.getEntity(), StackCause.SPAWN);
+			}
 		}
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	private void onChunkLoad(ChunkLoadEvent evt) {
 		if (core.config.getBoolean("triggers.events.chunk-load")) {
-			for (Entity entity : evt.getChunk().getEntities()) {
-				core.attemptMerges(entity, StackCause.CHUNK_LOAD);
-			}
+			Bukkit.getServer().getScheduler().runTaskLater(core.plugin, () -> {
+				for (Entity entity : evt.getChunk().getEntities()) {
+					if (entity instanceof LivingEntity) {
+						core.attemptMerges((LivingEntity) entity, StackCause.CHUNK_LOAD);
+					}
+				}
+			}, 1L);
 		}
 	}
 	
@@ -63,11 +68,11 @@ public class StackListener implements Listener {
 		if (core.isStacked(entity)) {
 			int amount = core.getAmount(entity);
 			if (amount > 1) {
-				Entity progeny = entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
-				core.copyAttributes(entity, progeny);
+				LivingEntity progeny = (LivingEntity) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
+				progeny.setTicksLived(entity.getTicksLived());
 		        core.updateAmount(progeny, --amount);
 			}
-			core.untrack(entity);
+			core.amounts.remove(entity.getUniqueId());
 			core.plugin.getServer().getPluginManager().callEvent(new StackDeathEvent(entity));
 		}
 	}

@@ -19,30 +19,15 @@
 package space.arim.mobstacker;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Slime;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import space.arim.universal.util.function.ErringConsumer;
-
 import space.arim.api.util.FilesUtil;
-import space.arim.api.util.LazySingleton;
 import space.arim.api.uuid.UUIDUtil;
 
 import space.arim.mobstacker.api.MobStackerAPI;
@@ -57,20 +42,20 @@ public class MobStacker implements MobStackerAPI {
 	final StackConfig config;
 	private final StackListener listener;
 	
-	private final HashMap<UUID, Integer> amounts;
+	/*
+	 * 1 not stacked but stackable
+	 * 1+ stacked
+	 */
+	final HashMap<UUID, Integer> amounts;
 	
 	private StackPeriodic periodic;
-	private final LazySingleton<File> validFile;
-	final LazySingleton<Set<UUID>> validMobs;
 	
 	MobStacker(JavaPlugin plugin) {
 		this.plugin = plugin;
-		dataFile = new File(plugin.getDataFolder(), "data/stacks.txt");
+		dataFile = new File(plugin.getDataFolder(), "stacks.txt");
 		config = new StackConfig(plugin.getDataFolder());
 		listener = new StackListener(this);
 		amounts = new HashMap<UUID, Integer>();
-		validFile = new LazySingleton<File>(() -> new File(plugin.getDataFolder(), "data/valid.txt"));
-		validMobs = new LazySingleton<Set<UUID>>(() -> new HashSet<UUID>());
 	}
 	
 	void load() {
@@ -81,9 +66,6 @@ public class MobStacker implements MobStackerAPI {
 			if (loadDataFile()) {
 				plugin.getLogger().info("Loaded existing stacks!");
 			}
-			if (config.mobSpawnersOnly() && loadValidFile()) {
-				plugin.getLogger().info("Loaded valid entities!");
-			}
 			if (config.getBoolean("triggers.periodic.enable")) {
 				periodic = new StackPeriodic(this);
 				periodic.start();
@@ -91,95 +73,54 @@ public class MobStacker implements MobStackerAPI {
 		}
 	}
 	
-	private boolean processFile(File file, Consumer<String> processor) {
-		return FilesUtil.readLines(file, processor, (ex) -> plugin.getLogger().log(Level.WARNING, "Failed to read file " + file.getPath() + "!", ex));
-	}
-	
 	private boolean loadDataFile() {
-		return processFile(dataFile, (line) -> {
+		return FilesUtil.readLines(dataFile, (line) -> {
 			if (line.contains(":")) {
 				String[] data = line.split(":");
 				amounts.put(UUIDUtil.expandAndParse(data[0]), Integer.parseInt(data[1]));
 			}
-		});
-	}
-	
-	private boolean loadValidFile() {
-		return processFile(validFile.get(), (line) -> {
-			if (!line.isEmpty()) {
-				validMobs.get().add(UUIDUtil.expandAndParse(line));
-			}
-		});
+		}, (ex) -> plugin.getLogger().log(Level.WARNING, "Failed to read file " + dataFile.getPath() + "!", ex));
 	}
 	
 	@Override
-	public void attemptMerges(Entity entity, StackCause cause) {
-		if (isCorrectLocation(entity.getLocation()) && isStackable(entity)) {
-			for (Entity nearby : entity.getNearbyEntities(config.radiusX(), config.radiusY(), config.radiusZ())) {
-				if (isStackable(nearby)) {
-					attemptMerge((LivingEntity) entity, (LivingEntity) nearby, cause);
-				}
-			}
-		}
+	public int getAmount(LivingEntity entity) {
+		return amounts.getOrDefault(entity, 0);
 	}
 	
-	void copyAttributes(Entity entity, Entity progeny) {
-		progeny.setTicksLived(entity.getTicksLived());
+	@Override
+	public boolean isStackable(LivingEntity entity) {
+		return getAmount(entity) > 0;
 	}
 	
-	private boolean mergeable(LivingEntity entity, LivingEntity other) {
-		if (entity.getType() != other.getType()) {
-			return false;
-		}
-		if (config.getBoolean("stacking.separation.age.enable") && entity instanceof Ageable) {
-			Ageable age1 = (Ageable) entity;
-			Ageable age2 = (Ageable) other;
-			if (config.getBoolean("stacking.separation.age.strict")) {
-				if (age1.getAge() != age2.getAge()) {
-					return false;
-				}
-			} else if (age1.isAdult() && !age2.isAdult() || !age1.isAdult() && age2.isAdult()) {
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	private void attemptMerge(LivingEntity entity, LivingEntity nearby, StackCause cause) {
-		if (mergeable(entity, nearby)) {
-			int finalAmount = getAmount(entity) + getAmount(nearby);
-			if (finalAmount <= config.getInt("stacking.max-stack-size") && fireStackEvent(entity, nearby, cause)) {
-				updateAmount(entity, finalAmount);
-				nearby.remove();
-			}
-		}
-	}
-	
-	private boolean fireStackEvent(Entity stack, Entity stacked, StackCause cause) {
+	private boolean fireStackEvent(LivingEntity stack, LivingEntity stacked, StackCause cause) {
 		StackChangeEvent evt = new StackChangeEvent(stack, stacked, cause);
 		plugin.getServer().getPluginManager().callEvent(evt);
 		return !evt.isCancelled();
 	}
 	
-	boolean isCorrectLocation(Location location) {
-		return isCorrectWorld(location.getWorld());
+	@Override
+	public void attemptMerges(LivingEntity entity, StackCause cause) {
+		if (config.isCorrectLocation(entity.getLocation()) && isStackable(entity)) {
+			for (Entity nearby : entity.getNearbyEntities(config.radiusX(), config.radiusY(), config.radiusZ())) {
+				if (nearby instanceof LivingEntity) {
+					attemptMerge(entity, (LivingEntity) nearby, cause);
+				}
+			}
+		}
 	}
 	
-	private boolean isCorrectWorld(World world) {
-		List<String> worlds = config.getStrings("triggers.per-world.worlds");
-		return config.getBoolean("triggers.per-world.use-as-whitelist") ? worlds.contains(world.getName()) : !worlds.contains(world.getName());
+	private void attemptMerge(LivingEntity entity, LivingEntity nearby, StackCause cause) {
+		if (isStackable(nearby) && config.mergeable(entity, nearby)) {
+			int finalAmount = getAmount(entity) + getAmount(nearby);
+			if (finalAmount <= config.getInt("stacking.max-stack-size") && fireStackEvent(entity, nearby, cause)) {
+				updateAmount(entity, finalAmount);
+				amounts.remove(nearby.getUniqueId());
+				nearby.remove();
+			}
+		}
 	}
 	
-	private boolean isEntityTypeAllowed(EntityType type) {
-		List<String> typeList = config.getStrings("stacking.exempt.types");
-		return config.getBoolean("stacking.filter.use-as-whitelist") ? typeList.contains(type.name()) : !typeList.contains(type.name());
-	}
-	
-	private boolean isEntityValid(Entity entity) {
-		return !config.mobSpawnersOnly() || validMobs.get().contains(entity.getUniqueId());
-	}
-	
-	void updateAmount(Entity entity, int amount) {
+	void updateAmount(LivingEntity entity, int amount) {
 		if (config.getBoolean("stacking.names.enable")) {
 			entity.setCustomNameVisible(true);
 			entity.setCustomName(config.getString("stacking.names.name").replace("%COUNT%", Integer.toString(amount + 1)));
@@ -187,34 +128,16 @@ public class MobStacker implements MobStackerAPI {
 		amounts.put(entity.getUniqueId(), amount);
 	}
 	
-	void untrack(Entity entity) {
-		amounts.remove(entity.getUniqueId());
-	}
-	
 	@Override
-	public int getAmount(Entity entity) {
-		return amounts.containsKey(entity.getUniqueId()) ? amounts.get(entity.getUniqueId()) : isEverStackable(entity) ? 1 : 0;
-	}
-	
-	@Override
-	public void setAmount(Entity entity, int amount) {
+	public void setAmount(LivingEntity entity, int amount) {
 		if (isStackable(entity)) {
 			updateAmount(entity, amount);
 		}
 	}
 	
 	@Override
-	public boolean isStacked(Entity entity) {
+	public boolean isStacked(LivingEntity entity) {
 		return getAmount(entity) > 1;
-	}
-	
-	@Override
-	public boolean isStackable(Entity entity) {
-		return getAmount(entity) > 0;
-	}
-	
-	private boolean isEverStackable(Entity entity) {
-		return entity instanceof LivingEntity && !(entity instanceof Player) && !(entity instanceof Slime) && isEntityValid(entity) && isEntityTypeAllowed(entity.getType());
 	}
 	
 	@Override
@@ -229,25 +152,13 @@ public class MobStacker implements MobStackerAPI {
 		}
 	}
 	
-	private void printToFile(File file, ErringConsumer<Writer, IOException> printer) {
-		FilesUtil.writeTo(file, printer, (ex) -> plugin.getLogger().log(Level.WARNING, "Could not print data to file " + file.getPath() + "!", ex));
-	}
-	
 	@Override
 	public void close() {
-		printToFile(dataFile, (writer) -> {
+		FilesUtil.writeTo(dataFile, (writer) -> {
 			for (HashMap.Entry<UUID, Integer> entry : amounts.entrySet()) {
 				writer.append(entry.getKey().toString().replace("-", "") + ":" + entry.getValue() + "\n");
 			}
-		});
-		if (config.mobSpawnersOnly()) {
-			printToFile(validFile.get(), (writer) -> {
-				for (UUID uuid : validMobs.get()) {
-					writer.append(uuid.toString().replace("-", "") + "\n");
-				}
-			});
-			validMobs.get().clear();
-		}
+		}, (ex) -> plugin.getLogger().log(Level.WARNING, "Could not print data to file " + dataFile.getPath() + "!", ex));
 		if (periodic != null) {
 			periodic.stop();
 			periodic = null;
