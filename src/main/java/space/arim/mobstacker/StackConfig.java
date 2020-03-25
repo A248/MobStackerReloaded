@@ -36,14 +36,9 @@ public class StackConfig extends SimpleConfig {
 	@Override
 	public void reload() {
 		super.reload();
-		stacking_mobSpawnersOnly = getBoolean("stacking.mob-spawners-only");
 		stacking_radiusX = getInt("stacking.radius.x").doubleValue();
 		stacking_radiusY = getInt("stacking.radius.y").doubleValue();
 		stacking_radiusZ = getInt("stacking.radius.z").doubleValue();
-	}
-	
-	boolean mobSpawnersOnly() {
-		return stacking_mobSpawnersOnly;
 	}
 	
 	double radiusX() {

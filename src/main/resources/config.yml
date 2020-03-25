@@ -1,7 +1,6 @@
 enable-plugin: false
 stacking:
   max-stack-size: 64
-  mob-spawners-only: true
   radius:
     x: 3
     y: 3
