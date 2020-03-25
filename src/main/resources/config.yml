@@ -11,7 +11,7 @@ stacking:
       strict: false
   names:
     enable: true
-    name: '[%COUNT%] %TYPE%'
+    name: '&6&l%COUNT%&r &7%TYPE%'
   exempt:
     use-as-whitelist: false
     types:
