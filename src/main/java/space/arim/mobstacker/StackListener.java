@@ -41,21 +41,21 @@ public class StackListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	private void onSpawn(CreatureSpawnEvent evt) {
-		if (evt.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) && core.config.isTypeStackable(evt.getEntity())) {
+		if (evt.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) && core.config.isTypeStackable(evt.getEntity()) && core.config.isCorrectWorld(evt.getLocation().getWorld())) {
 			core.amounts.put(evt.getEntity().getUniqueId(), 1);
 			if (core.config.getBoolean("triggers.events.spawn")) {
-				core.attemptMerges(evt.getEntity(), StackCause.SPAWN);
+				core.directAttemptMerges(evt.getEntity(), StackCause.SPAWN);
 			}
 		}
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	private void onChunkLoad(ChunkLoadEvent evt) {
-		if (core.config.getBoolean("triggers.events.chunk-load")) {
+		if (core.config.getBoolean("triggers.events.chunk-load") && core.config.isCorrectWorld(evt.getWorld())) {
 			Bukkit.getServer().getScheduler().runTaskLater(core.plugin, () -> {
 				for (Entity entity : evt.getChunk().getEntities()) {
 					if (entity instanceof LivingEntity) {
-						core.attemptMerges((LivingEntity) entity, StackCause.CHUNK_LOAD);
+						core.directAttemptMerges((LivingEntity) entity, StackCause.CHUNK_LOAD);
 					}
 				}
 			}, 1L);
@@ -65,7 +65,7 @@ public class StackListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	private void onDeath(EntityDeathEvent evt) {
 		LivingEntity entity = evt.getEntity();
-		if (core.isStacked(entity)) {
+		if (core.isStacked(entity) && core.config.isCorrectWorld(evt.getEntity().getWorld())) {
 			int amount = core.getAmount(entity);
 			if (amount > 1) {
 				LivingEntity progeny = (LivingEntity) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());

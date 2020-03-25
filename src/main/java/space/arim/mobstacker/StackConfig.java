@@ -21,7 +21,6 @@ package space.arim.mobstacker;
 import java.io.File;
 import java.util.List;
 
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.EntityType;
@@ -33,6 +32,10 @@ import space.arim.api.config.SimpleConfig;
 
 public class StackConfig extends SimpleConfig {
 
+	List<String> worlds;
+	boolean worldsAsWhitelist;
+	List<String> types;
+	boolean typesAsWhitelist;
 	private double stacking_radiusX;
 	private double stacking_radiusY;
 	private double stacking_radiusZ;
@@ -44,6 +47,10 @@ public class StackConfig extends SimpleConfig {
 	@Override
 	public void reload() {
 		super.reload();
+		worlds = getStrings("triggers.per-world.worlds");
+		worldsAsWhitelist = getBoolean("triggers.per-world.use-as-whitelist");
+		types = getStrings("stacking.exempt.types");
+		typesAsWhitelist = getBoolean("stacking.exempt.use-as-whitelist");
 		stacking_radiusX = getInt("stacking.radius.x").doubleValue();
 		stacking_radiusY = getInt("stacking.radius.y").doubleValue();
 		stacking_radiusZ = getInt("stacking.radius.z").doubleValue();
@@ -62,21 +69,15 @@ public class StackConfig extends SimpleConfig {
 	}
 	
 	private boolean isEntityTypeAllowed(EntityType type) {
-		List<String> typeList = getStrings("stacking.exempt.types");
-		return getBoolean("stacking.exempt.use-as-whitelist") ? typeList.contains(type.name()) : !typeList.contains(type.name());
+		return typesAsWhitelist ? types.contains(type.name()) : !types.contains(type.name());
 	}
 	
 	boolean isTypeStackable(LivingEntity entity) {
 		return !(entity instanceof Player) && !(entity instanceof Slime) && isEntityTypeAllowed(entity.getType());
 	}
 	
-	private boolean isCorrectWorld(World world) {
-		List<String> worlds = getStrings("triggers.per-world.worlds");
-		return getBoolean("triggers.per-world.use-as-whitelist") ? worlds.contains(world.getName()) : !worlds.contains(world.getName());
-	}
-	
-	boolean isCorrectLocation(Location location) {
-		return isCorrectWorld(location.getWorld());
+	boolean isCorrectWorld(World world) {
+		return worldsAsWhitelist ? worlds.contains(world.getName()) : !worlds.contains(world.getName());
 	}
 	
 	boolean mergeable(LivingEntity entity, LivingEntity other) {

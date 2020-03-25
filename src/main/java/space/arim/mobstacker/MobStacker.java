@@ -90,14 +90,20 @@ public class MobStacker implements MobStackerAPI {
 		return !evt.isCancelled();
 	}
 	
-	@Override
-	public void attemptMerges(LivingEntity entity, StackCause cause) {
-		if (config.isCorrectLocation(entity.getLocation()) && isStackable(entity)) {
+	void directAttemptMerges(LivingEntity entity, StackCause cause) {
+		if (isStackable(entity)) {
 			for (Entity nearby : entity.getNearbyEntities(config.radiusX(), config.radiusY(), config.radiusZ())) {
 				if (nearby instanceof LivingEntity) {
 					attemptMerge(entity, (LivingEntity) nearby, cause);
 				}
 			}
+		}
+	}
+	
+	@Override
+	public void attemptMerges(LivingEntity entity, StackCause cause) {
+		if (config.isCorrectWorld(entity.getWorld())) {
+			directAttemptMerges(entity, cause);
 		}
 	}
 	

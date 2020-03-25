@@ -39,9 +39,11 @@ public class StackPeriodic {
 	void start() {
 		task = Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(core.plugin, () -> {
 			for (World world : core.plugin.getServer().getWorlds()) {
-				for (Entity entity : world.getEntities()) {
-					if (entity instanceof LivingEntity) {
-						core.attemptMerges((LivingEntity) entity, StackCause.PERIODIC);
+				if (core.config.isCorrectWorld(world)) {
+					for (Entity entity : world.getEntities()) {
+						if (entity instanceof LivingEntity) {
+							core.directAttemptMerges((LivingEntity) entity, StackCause.PERIODIC);
+						}
 					}
 				}
 			}
