@@ -18,13 +18,11 @@
  */
 package space.arim.mobstacker;
 
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-
-import space.arim.universal.registry.UniversalRegistry;
-import space.arim.universal.util.concurrent.Task;
-
-import space.arim.api.concurrent.SyncExecution;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.scheduler.BukkitTask;
 
 import space.arim.mobstacker.api.StackCause;
 
@@ -32,17 +30,19 @@ public class StackPeriodic {
 
 	private final MobStacker core;
 	
-	private Task task;
+	private BukkitTask task;
 	
 	StackPeriodic(MobStacker core) {
 		this.core = core;
 	}
 	
 	void start() {
-		task = UniversalRegistry.get().getRegistration(SyncExecution.class).runTaskTimer(() -> {
+		task = Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(core.plugin, () -> {
 			for (World world : core.plugin.getServer().getWorlds()) {
 				for (Entity entity : world.getEntities()) {
-					core.attemptMerges(entity, StackCause.PERIODIC);
+					if (entity instanceof LivingEntity) {
+						core.attemptMerges((LivingEntity) entity, StackCause.PERIODIC);
+					}
 				}
 			}
 		}, 1000L*core.config.getInt("triggers.periodic.period").longValue());
