@@ -20,7 +20,11 @@ package space.arim.mobstacker;
 
 import org.bstats.bukkit.Metrics;
 
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import space.arim.mobstacker.api.MobStackerAPI;
 
 public class MobStackerPlugin extends JavaPlugin {
 
@@ -34,6 +38,7 @@ public class MobStackerPlugin extends JavaPlugin {
 		if (metrics.isEnabled()) {
 			getLogger().info("Metrics enabled!");
 		}
+		Bukkit.getServicesManager().register(MobStackerAPI.class, core, this, ServicePriority.Low);
 	}
 	
 	@Override
