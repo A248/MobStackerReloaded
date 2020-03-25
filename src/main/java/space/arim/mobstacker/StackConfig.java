@@ -19,6 +19,14 @@
 package space.arim.mobstacker;
 
 import java.io.File;
+import java.util.List;
+
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Slime;
 
 import space.arim.api.config.SimpleConfig;
 
@@ -27,7 +35,6 @@ public class StackConfig extends SimpleConfig {
 	private double stacking_radiusX;
 	private double stacking_radiusY;
 	private double stacking_radiusZ;
-	private boolean stacking_mobSpawnersOnly;
 	
 	public StackConfig(File folder) {
 		super(folder, "do-not-touch-version");
@@ -51,6 +58,24 @@ public class StackConfig extends SimpleConfig {
 	
 	double radiusZ() {
 		return stacking_radiusZ;
+	}
+	
+	private boolean isEntityTypeAllowed(EntityType type) {
+		List<String> typeList = getStrings("stacking.exempt.types");
+		return getBoolean("stacking.filter.use-as-whitelist") ? typeList.contains(type.name()) : !typeList.contains(type.name());
+	}
+	
+	boolean isTypeStackable(LivingEntity entity) {
+		return !(entity instanceof Player) && !(entity instanceof Slime) && isEntityTypeAllowed(entity.getType());
+	}
+	
+	private boolean isCorrectWorld(World world) {
+		List<String> worlds = getStrings("triggers.per-world.worlds");
+		return getBoolean("triggers.per-world.use-as-whitelist") ? worlds.contains(world.getName()) : !worlds.contains(world.getName());
+	}
+	
+	boolean isCorrectLocation(Location location) {
+		return isCorrectWorld(location.getWorld());
 	}
 
 }
