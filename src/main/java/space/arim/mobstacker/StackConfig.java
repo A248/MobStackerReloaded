@@ -91,5 +91,11 @@ public class StackConfig extends SimpleConfig {
 		}
 		return true;
 	}
+	
+	String toStringEntity(EntityType type) {
+		char[] result = type.toString().toLowerCase().toCharArray();
+		result[0] = Character.toUpperCase(result[0]);
+		return String.valueOf(result);
+	}
 
 }
