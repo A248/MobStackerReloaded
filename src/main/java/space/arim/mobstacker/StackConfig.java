@@ -28,19 +28,23 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
 
+import org.bukkit.ChatColor;
+
 import space.arim.api.config.SimpleConfig;
 
 public class StackConfig extends SimpleConfig {
 
-	List<String> worlds;
-	boolean worldsAsWhitelist;
-	List<String> types;
-	boolean typesAsWhitelist;
+	private List<String> worlds;
+	private boolean worldsAsWhitelist;
+	private List<String> types;
+	private boolean typesAsWhitelist;
 	private double stacking_radiusX;
 	private double stacking_radiusY;
 	private double stacking_radiusZ;
+	private boolean useDisplayName;
+	private String displayName;
 	
-	public StackConfig(File folder) {
+	StackConfig(File folder) {
 		super(folder, "config.yml", "do-not-touch-version");
 	}
 	
@@ -54,6 +58,10 @@ public class StackConfig extends SimpleConfig {
 		stacking_radiusX = getInt("stacking.radius.x").doubleValue();
 		stacking_radiusY = getInt("stacking.radius.y").doubleValue();
 		stacking_radiusZ = getInt("stacking.radius.z").doubleValue();
+		useDisplayName = getBoolean("stacking.names.enable");
+		if (useDisplayName) {
+			displayName = ChatColor.translateAlternateColorCodes('&', getString("stacking.names.name"));
+		}
 	}
 	
 	double radiusX() {
@@ -97,6 +105,14 @@ public class StackConfig extends SimpleConfig {
 		char[] result = type.toString().toLowerCase().toCharArray();
 		result[0] = Character.toUpperCase(result[0]);
 		return String.valueOf(result);
+	}
+	
+	boolean useDisplayName() {
+		return useDisplayName;
+	}
+	
+	String getDisplayName() {
+		return displayName;
 	}
 
 }

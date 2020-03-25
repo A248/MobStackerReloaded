@@ -119,9 +119,9 @@ public class MobStacker implements MobStackerAPI {
 	}
 	
 	void updateAmount(LivingEntity entity, int amount) {
-		if (config.getBoolean("stacking.names.enable")) {
+		if (config.useDisplayName()) {
 			entity.setCustomNameVisible(true);
-			entity.setCustomName(config.getString("stacking.names.name").replace("%COUNT%", Integer.toString(amount)).replace("%TYPE%", config.toStringEntity(entity.getType())));
+			entity.setCustomName(config.getDisplayName().replace("%COUNT%", Integer.toString(amount)).replace("%TYPE%", config.toStringEntity(entity.getType())));
 		}
 		amounts.put(entity.getUniqueId(), amount);
 	}
