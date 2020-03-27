@@ -18,6 +18,9 @@
  */
 package space.arim.mobstacker;
 
+import java.util.HashSet;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -25,6 +28,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 
@@ -34,6 +38,7 @@ import space.arim.mobstacker.api.StackDeathEvent;
 public class StackListener implements Listener {
 
 	private final MobStacker core;
+	final HashSet<UUID> aoeDeaths = new HashSet<UUID>();
 	
 	StackListener(MobStacker core) {
 		this.core = core;
@@ -63,15 +68,46 @@ public class StackListener implements Listener {
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	private void onDamage(EntityDamageEvent evt) {
+		if (evt.getEntity() instanceof LivingEntity) {
+			LivingEntity entity = (LivingEntity) evt.getEntity();
+			if (core.isStacked(entity) && core.config.isCorrectWorld(entity.getWorld())
+					&& core.config.getStrings("stacking.aoe-damage.causes").contains(evt.getCause().name())) {
+				double health = (core.config.getBoolean("stacking.aoe-damage.use-max-health")) ? entity.getMaxHealth()
+						: entity.getHealth();
+				if (evt.getFinalDamage() > health) {
+					aoeDeaths.add(entity.getUniqueId());
+				}
+			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	private void onDeath(EntityDeathEvent evt) {
 		LivingEntity entity = evt.getEntity();
 		if (core.isStacked(entity) && core.config.isCorrectWorld(evt.getEntity().getWorld())) {
-			int amount = core.getAmount(entity);
-			if (amount > 1) {
-				LivingEntity progeny = (LivingEntity) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
-				progeny.setTicksLived(entity.getTicksLived());
-		        core.updateAmount(progeny, --amount);
+			boolean aoeDeath = aoeDeaths.remove(entity.getUniqueId());
+
+			// find existing amount of entity
+			int stackSize = core.getAmount(entity);
+			if (stackSize > 1) {
+
+				if (aoeDeath) {
+					// entire stack must die, multiply drops and xp
+					evt.setDroppedExp(evt.getDroppedExp() * stackSize);
+					evt.getDrops().forEach((item) -> item.setAmount(item.getAmount() * stackSize));
+				} else {
+					// typical scenario, only 1 entity dies
+					LivingEntity progeny = (LivingEntity) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
+					// copy attributes
+					progeny.setTicksLived(entity.getTicksLived());
+					progeny.setCanPickupItems(entity.getCanPickupItems());
+					progeny.setCustomName(entity.getCustomName());
+					progeny.setVelocity(entity.getVelocity());
+			        core.updateAmount(progeny, (stackSize - 1));
+				}
 			}
+			// cleanup
 			core.amounts.remove(entity.getUniqueId());
 			core.plugin.getServer().getPluginManager().callEvent(new StackDeathEvent(entity));
 		}

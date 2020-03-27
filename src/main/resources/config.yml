@@ -16,6 +16,10 @@ stacking:
     use-as-whitelist: false
     types:
       - 'VILLAGER'
+  aoe-damage:
+    use-max-health: true
+    causes:
+      - 'FALL'
 triggers:
   per-world:
     use-as-whitelist: true

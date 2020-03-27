@@ -184,6 +184,7 @@ public class MobStacker implements MobStackerAPI {
 			periodic.stop();
 			periodic = null;
 		}
+		listener.aoeDeaths.clear();
 	}
 	
 }
