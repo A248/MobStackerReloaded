@@ -37,7 +37,7 @@ public class StackPeriodic {
 	}
 	
 	void start() {
-		task = Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(core.plugin, () -> {
+		task = Bukkit.getServer().getScheduler().runTaskTimer(core.plugin, () -> {
 			for (World world : core.plugin.getServer().getWorlds()) {
 				if (core.config.isCorrectWorld(world)) {
 					for (Entity entity : world.getEntities()) {
@@ -47,7 +47,7 @@ public class StackPeriodic {
 					}
 				}
 			}
-		}, 1000L*core.config.getInt("triggers.periodic.period").longValue());
+		}, 0L, 20L * core.config.getInt("triggers.periodic.period").longValue());
 	}
 	
 	void stop() {
