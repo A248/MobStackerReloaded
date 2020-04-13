@@ -119,8 +119,6 @@ public class MobStacker implements MobStackerAPI {
 	void load() {
 		config.reload();
 		if (config.getBoolean("enable-plugin")) {
-			registerEventsIfNotAlready();
-
 			File[] mobFiles = (new File(plugin.getDataFolder(), "mob-data")).listFiles();
 			// if the mob-data directory doesn't exist or isn't a dir, mobFiles must be null
 			if (mobFiles != null) {
@@ -139,16 +137,19 @@ public class MobStacker implements MobStackerAPI {
 					}
 				}
 			}
-			if (futures != null) {
-				futures.forEach((f) -> f.join()); // await termination
-				futures = null;
-			}
-			logger.info("Loaded mob data files!");
+
+			registerEventsIfNotAlready();
 
 			if (config.getBoolean("triggers.periodic.enable")) {
 				periodic = new StackPeriodic(this);
 				periodic.start();
 			}
+
+			if (futures != null) {
+				futures.forEach((f) -> f.join()); // await termination
+				futures = null;
+			}
+			logger.info("Loaded mob data files!");
 		} else {
 			logger.info("Turn on enable-plugin in the config.yml to enable MobStackerReloaded.");
 		}
