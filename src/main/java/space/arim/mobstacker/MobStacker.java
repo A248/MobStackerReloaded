@@ -162,10 +162,6 @@ public class MobStacker implements MobStackerAPI {
 	int getSize(LivingEntity entity) {
 		return getStackInfo(entity).getSize();
 	}
-	
-	double getHealth(LivingEntity entity) {
-		return getStackInfo(entity).getHealth();
-	}
 
 	@Override
 	public void setSize(LivingEntity entity, int amount) {
