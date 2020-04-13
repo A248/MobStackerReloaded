@@ -31,4 +31,7 @@ triggers:
   periodic:
     enable: false
     period-in-seconds: 6
+messages:
+  reloaded: '&aMobStackerReloaded has been reloaded!'
+  no-permission: '&cSorry, you cannot use this.'
 do-not-touch-version: 1

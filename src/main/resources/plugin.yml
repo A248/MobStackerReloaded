@@ -4,3 +4,8 @@ version: ${project.version}
 author: A248
 description: ${project.description}
 depend: [ArimAPI]
+
+commands:
+  mobstacker:
+    usage: /mobstacker
+    description: MobStackerReloaded commands

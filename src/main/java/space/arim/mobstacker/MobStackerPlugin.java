@@ -21,6 +21,8 @@ package space.arim.mobstacker;
 import org.bstats.bukkit.Metrics;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -45,6 +47,18 @@ public class MobStackerPlugin extends JavaPlugin {
 	public void onDisable() {
 		core.close();
 		core = null;
+	}
+	
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		if (sender.hasPermission("mobstacker.reload")) {
+			core.reload();
+			sender.sendMessage(core.config.getString("messages.reloaded"));
+		} else {
+			sender.sendMessage(core.config.getString("messages.no-permission"));
+		}
+		return true;
+		
 	}
 	
 }
