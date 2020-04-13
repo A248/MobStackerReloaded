@@ -47,7 +47,7 @@ public class StackPeriodic {
 					}
 				}
 			}
-		}, 0L, 20L * core.config.getInt("triggers.periodic.period").longValue());
+		}, 0L, 20L * core.config.getInt("triggers.periodic.period-in-seconds").longValue());
 	}
 	
 	void stop() {

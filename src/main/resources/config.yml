@@ -30,5 +30,5 @@ triggers:
     chunk-load: true
   periodic:
     enable: false
-    period: 6
+    period-in-seconds: 6
 do-not-touch-version: 1
