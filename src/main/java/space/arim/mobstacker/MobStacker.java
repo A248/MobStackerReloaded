@@ -244,7 +244,10 @@ public class MobStacker implements MobStackerAPI {
 					stacks.remove(stacked.getUniqueId());
 					stacked.remove();
 
-					updateName(stack, result);
+					updateName(stack, result);					
+
+					// recursively continue attempting merges
+					directAttemptMerges(stack, cause);
 				}
 			}
 		}
