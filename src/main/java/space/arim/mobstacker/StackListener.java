@@ -18,9 +18,6 @@
  */
 package space.arim.mobstacker;
 
-import java.util.HashSet;
-import java.util.UUID;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -38,7 +35,6 @@ import space.arim.mobstacker.api.StackDeathEvent;
 public class StackListener implements Listener {
 
 	private final MobStacker core;
-	final HashSet<UUID> aoeDeaths = new HashSet<>();
 	
 	StackListener(MobStacker core) {
 		this.core = core;

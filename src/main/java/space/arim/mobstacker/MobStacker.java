@@ -279,7 +279,6 @@ public class MobStacker implements MobStackerAPI {
 			periodic.stop();
 			periodic = null;
 		}
-		listener.aoeDeaths.clear();
 
 		File mobDataFolder = new File(plugin.getDataFolder(), "mob-data");
 		if (mobDataFolder.isDirectory() || mobDataFolder.mkdirs()) {
