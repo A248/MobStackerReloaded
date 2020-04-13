@@ -19,7 +19,14 @@ stacking:
   aoe-damage:
     use-as-whitelist: true
     causes:
+      - 'BLOCK_EXPLOSION'
+      - 'ENTITY_EXPLOSION'
       - 'FALL'
+      - 'FIRE'
+      - 'FIRE_TICK'
+      - 'LAVA'
+      - 'MAGIC'
+      - 'SUFFOCATION'
 triggers:
   per-world:
     use-as-whitelist: true
