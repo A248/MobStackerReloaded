@@ -29,9 +29,10 @@ public class StackChangeEvent extends StackEvent implements Cancellable {
 	private final LivingEntity stacked;
 	private final StackInfo stackedInfo;
 	private final StackCause cause;
+
 	private volatile boolean cancelled = false;
 	
-	public StackChangeEvent(LivingEntity stack, LivingEntity stacked, StackInfo stackInfo, StackInfo stackedInfo, StackCause cause) {
+	public StackChangeEvent(LivingEntity stack, StackInfo stackInfo, LivingEntity stacked, StackInfo stackedInfo, StackCause cause) {
 		super(stack, stackInfo);
 		this.stacked = stacked;
 		this.stackedInfo = stackedInfo;
