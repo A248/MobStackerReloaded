@@ -38,7 +38,7 @@ import space.arim.mobstacker.api.StackDeathEvent;
 public class StackListener implements Listener {
 
 	private final MobStacker core;
-	final HashSet<UUID> aoeDeaths = new HashSet<UUID>();
+	final HashSet<UUID> aoeDeaths = new HashSet<>();
 	
 	StackListener(MobStacker core) {
 		this.core = core;
@@ -46,8 +46,12 @@ public class StackListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	private void onSpawn(CreatureSpawnEvent evt) {
-		if (evt.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER) && core.config.isTypeStackable(evt.getEntity()) && core.config.isCorrectWorld(evt.getLocation().getWorld())) {
-			core.amounts.put(evt.getEntity().getUniqueId(), 1);
+		if (evt.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER)
+				&& core.config.isTypeStackable(evt.getEntity())
+				&& core.config.isCorrectWorld(evt.getLocation().getWorld())) {
+
+			core.stacks.put(evt.getEntity().getUniqueId(), new StackInfoImpl(1, evt.getEntity().getMaxHealth()));
+
 			if (core.config.getBoolean("triggers.events.spawn")) {
 				core.directAttemptMerges(evt.getEntity(), StackCause.SPAWN);
 			}
@@ -71,13 +75,11 @@ public class StackListener implements Listener {
 	private void onDamage(EntityDamageEvent evt) {
 		if (evt.getEntity() instanceof LivingEntity) {
 			LivingEntity entity = (LivingEntity) evt.getEntity();
-			if (core.isStacked(entity) && core.config.isCorrectWorld(entity.getWorld())
-					&& core.config.getStrings("stacking.aoe-damage.causes").contains(evt.getCause().name())) {
-				double health = (core.config.getBoolean("stacking.aoe-damage.use-max-health")) ? entity.getMaxHealth()
-						: entity.getHealth();
-				if (evt.getFinalDamage() > health) {
-					aoeDeaths.add(entity.getUniqueId());
-				}
+			if (core.config.isAoe(evt.getCause())) {
+
+				double damage = evt.getFinalDamage();
+				core.stacks.computeIfPresent(entity.getUniqueId(),
+						(uuid, stack) -> new StackInfoImpl(stack.getSize(), stack.getHealth() - damage));
 			}
 		}
 	}
@@ -86,30 +88,43 @@ public class StackListener implements Listener {
 	private void onDeath(EntityDeathEvent evt) {
 		LivingEntity entity = evt.getEntity();
 		if (core.isStacked(entity) && core.config.isCorrectWorld(evt.getEntity().getWorld())) {
-			boolean aoeDeath = aoeDeaths.remove(entity.getUniqueId());
-
 			// find existing amount of entity
-			int stackSize = core.getAmount(entity);
-			if (stackSize > 1) {
+			StackInfoImpl stackInfo = core.getStackInfo(entity);
+			int stackSize = stackInfo.getSize();
+			double stackHealth = stackInfo.getHealth();
 
-				if (aoeDeath) {
+			if (stackSize > 1) {
+				if (stackHealth < MobStacker.HEALTH_DEATH_THRESHOLD) {
 					// entire stack must die, multiply drops and xp
 					evt.setDroppedExp(evt.getDroppedExp() * stackSize);
 					evt.getDrops().forEach((item) -> item.setAmount(item.getAmount() * stackSize));
 				} else {
-					// typical scenario, only 1 entity dies
+					// typical scenario, only 1 entity from the stack dies, so we spawn another
 					LivingEntity progeny = (LivingEntity) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
+
 					// copy attributes
-					progeny.setTicksLived(entity.getTicksLived());
 					progeny.setCanPickupItems(entity.getCanPickupItems());
 					progeny.setCustomName(entity.getCustomName());
+					progeny.setFireTicks(entity.getFireTicks());
+					progeny.setLeashHolder(entity.getLeashHolder());
+					progeny.setMaximumAir(entity.getMaximumAir());
+					progeny.setMaximumNoDamageTicks(entity.getMaximumNoDamageTicks());
+					progeny.setNoDamageTicks(entity.getNoDamageTicks());
+					progeny.setRemainingAir(entity.getRemainingAir());
+					progeny.setRemoveWhenFarAway(entity.getRemoveWhenFarAway());
+					progeny.setTicksLived(entity.getTicksLived());
 					progeny.setVelocity(entity.getVelocity());
-			        core.updateAmount(progeny, (stackSize - 1));
+
+					// update stack size
+			        StackInfoImpl result = new StackInfoImpl((stackSize - 1), stackInfo.getHealth());
+			        core.stacks.put(progeny.getUniqueId(), result);
+
+			        core.updateName(progeny, result);
 				}
 			}
 			// cleanup
-			core.amounts.remove(entity.getUniqueId());
-			core.plugin.getServer().getPluginManager().callEvent(new StackDeathEvent(entity));
+			core.stacks.remove(entity.getUniqueId());
+			core.plugin.getServer().getPluginManager().callEvent(new StackDeathEvent(entity, stackInfo));
 		}
 	}
 	

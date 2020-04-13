@@ -11,13 +11,13 @@ stacking:
       strict: false
   names:
     enable: true
-    name: '&6&l%COUNT%&r &7%TYPE%'
+    name: '&6&l%SIZE%&r &7%TYPE%'
   exempt:
     use-as-whitelist: false
     types:
       - 'VILLAGER'
   aoe-damage:
-    use-max-health: true
+    use-as-whitelist: true
     causes:
       - 'FALL'
 triggers:

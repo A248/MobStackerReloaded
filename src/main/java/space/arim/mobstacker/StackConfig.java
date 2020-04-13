@@ -27,7 +27,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
-
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.ChatColor;
 
 import space.arim.api.config.SimpleConfig;
@@ -38,6 +38,8 @@ public class StackConfig extends SimpleConfig {
 	private boolean worldsAsWhitelist;
 	private List<String> types;
 	private boolean typesAsWhitelist;
+	private List<String> aoe;
+	private boolean aoeAsWhitelist;
 	private double stacking_radiusX;
 	private double stacking_radiusY;
 	private double stacking_radiusZ;
@@ -55,6 +57,8 @@ public class StackConfig extends SimpleConfig {
 		worldsAsWhitelist = getBoolean("triggers.per-world.use-as-whitelist");
 		types = getStrings("stacking.exempt.types");
 		typesAsWhitelist = getBoolean("stacking.exempt.use-as-whitelist");
+		aoe = getStrings("stacking.aoe-damage.causes");
+		aoeAsWhitelist = getBoolean("stacking.aoe-damage.use-as-whitelist");
 		stacking_radiusX = getInt("stacking.radius.x").doubleValue();
 		stacking_radiusY = getInt("stacking.radius.y").doubleValue();
 		stacking_radiusZ = getInt("stacking.radius.z").doubleValue();
@@ -86,6 +90,10 @@ public class StackConfig extends SimpleConfig {
 	
 	boolean isCorrectWorld(World world) {
 		return worldsAsWhitelist ? worlds.contains(world.getName()) : !worlds.contains(world.getName());
+	}
+	
+	boolean isAoe(DamageCause cause) {
+		return aoeAsWhitelist ? aoe.contains(cause.name()) : !aoe.contains(cause.name());
 	}
 	
 	boolean mergeable(LivingEntity entity, LivingEntity other) {

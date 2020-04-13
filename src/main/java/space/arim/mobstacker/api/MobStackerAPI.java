@@ -34,7 +34,7 @@ public interface MobStackerAPI extends AutoClosable {
 	 * Returns the stack information of an entity.
 	 * 
 	 * @param entity the entity
-	 * @return the stack info
+	 * @return nonnull stack info
 	 */
 	StackInfo getStackInfo(LivingEntity entity);
 	
