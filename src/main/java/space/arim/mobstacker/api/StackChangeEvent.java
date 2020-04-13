@@ -18,7 +18,7 @@
  */
 package space.arim.mobstacker.api;
 
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 
@@ -26,13 +26,15 @@ public class StackChangeEvent extends StackEvent implements Cancellable {
 
 	private static final HandlerList HANDLERS = new HandlerList();
 	
-	private final Entity stacked;
+	private final LivingEntity stacked;
+	private final StackInfo stackedInfo;
 	private final StackCause cause;
 	private volatile boolean cancelled = false;
 	
-	public StackChangeEvent(Entity stack, Entity stacked, StackCause cause) {
-		super(stack);
+	public StackChangeEvent(LivingEntity stack, LivingEntity stacked, StackInfo stackInfo, StackInfo stackedInfo, StackCause cause) {
+		super(stack, stackInfo);
 		this.stacked = stacked;
+		this.stackedInfo = stackedInfo;
 		this.cause = cause;
 	}
 	
@@ -41,8 +43,18 @@ public class StackChangeEvent extends StackEvent implements Cancellable {
 	 * 
 	 * @return the stacked entity
 	 */
-	public Entity getStackedEntity() {
+	public LivingEntity getStackedEntity() {
 		return stacked;
+	}
+	
+	/**
+	 * The info of the entity which will be added to the stack,
+	 * before the event occurs
+	 * 
+	 * @return the stacked entity info
+	 */
+	public StackInfo getStackedEntityInfo() {
+		return stackedInfo;
 	}
 	
 	/**

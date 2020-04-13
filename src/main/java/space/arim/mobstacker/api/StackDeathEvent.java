@@ -18,15 +18,15 @@
  */
 package space.arim.mobstacker.api;
 
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.HandlerList;
 
 public class StackDeathEvent extends StackEvent {
 
 	private static final HandlerList HANDLERS = new HandlerList();
 	
-	public StackDeathEvent(Entity stack) {
-		super(stack);
+	public StackDeathEvent(LivingEntity stack, StackInfo stackInfo) {
+		super(stack, stackInfo);
 	}
 	
 	@Override

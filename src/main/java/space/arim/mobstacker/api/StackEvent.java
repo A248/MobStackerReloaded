@@ -18,7 +18,7 @@
  */
 package space.arim.mobstacker.api;
 
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 
 /**
@@ -29,19 +29,30 @@ import org.bukkit.event.Event;
  */
 public abstract class StackEvent extends Event {
 	
-	private final Entity entity;
+	private final LivingEntity entity;
+	private final StackInfo info;
 	
-	StackEvent(Entity entity) {
+	StackEvent(LivingEntity entity, StackInfo info) {
 		this.entity = entity;
+		this.info = info;
 	}
 	
 	/**
-	 * The entity which represents the entire stack.
+	 * The entity which represents the entire stack
 	 * 
 	 * @return the stack entity
 	 */
-	public Entity getStackEntity() {
+	public LivingEntity getStackEntity() {
 		return entity;
+	}
+	
+	/**
+	 * The stack info of the entity, before the event occurs
+	 * 
+	 * @return the stack entity info
+	 */
+	public StackInfo getStackEntityInfo() {
+		return info;
 	}
 	
 }
