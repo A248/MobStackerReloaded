@@ -256,7 +256,7 @@ public class MobStacker implements MobStackerAPI {
 	void updateName(LivingEntity entity, StackInfo info) {
 		if (config.useDisplayName()) {
 			entity.setCustomNameVisible(true);
-			entity.setCustomName(config.getDisplayName().replace("%COUNT%", Integer.toString(info.getSize()))
+			entity.setCustomName(config.getDisplayName().replace("%SIZE%", Integer.toString(info.getSize()))
 					.replace("%HEALTH%", Double.toString(info.getHealth()))
 					.replace("%TYPE%", config.toStringEntity(entity.getType())));
 		}
