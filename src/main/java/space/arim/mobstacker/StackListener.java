@@ -100,7 +100,9 @@ public class StackListener implements Listener {
 
 					// copy attributes
 					progeny.setCanPickupItems(entity.getCanPickupItems());
-					progeny.setCustomName(entity.getCustomName());
+					if (!core.config.useDisplayName()) {
+						progeny.setCustomName(entity.getCustomName());
+					}
 					progeny.setFireTicks(entity.getFireTicks());
 					progeny.setMaximumAir(entity.getMaximumAir());
 					progeny.setMaximumNoDamageTicks(entity.getMaximumNoDamageTicks());
