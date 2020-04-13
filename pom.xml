@@ -8,7 +8,7 @@
 	<version>0.4.0-SNAPSHOT</version>
 	
 	<name>MobStackerReloaded</name>
-	<description>Recoded MobStacker plugin for Spigot servers.</description>
+	<description>Lightweight entity-stacking plugin for Spigot servers.</description>
 	
 	<properties>
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
