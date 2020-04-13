@@ -83,6 +83,8 @@ public class MobStacker implements MobStackerAPI {
 	 */
 	static final double HEALTH_DEATH_THRESHOLD = 0.5D;
 	
+	private boolean registered = false;
+	
 	MobStacker(JavaPlugin plugin) {
 		this.plugin = plugin;
 		logger = LoggerConverter.get().convert(plugin.getLogger());
@@ -106,11 +108,18 @@ public class MobStacker implements MobStackerAPI {
 		};
 	}
 	
+	private void registerEventsIfNotAlready() {
+		if (!registered) {
+			registered = true;
+			plugin.getServer().getPluginManager().registerEvents(listener, plugin);
+			logger.info("Registered events!");
+		}
+	}
+	
 	void load() {
 		config.reload();
 		if (config.getBoolean("enable-plugin")) {
-			plugin.getServer().getPluginManager().registerEvents(listener, plugin);
-			logger.info("Registered events!");
+			registerEventsIfNotAlready();
 
 			File[] mobFiles = (new File(plugin.getDataFolder(), "mob-data")).listFiles();
 			// if the mob-data directory doesn't exist or isn't a dir, mobFiles must be null
@@ -256,6 +265,8 @@ public class MobStacker implements MobStackerAPI {
 	@Override
 	public void reload() {
 		config.reload();
+		registerEventsIfNotAlready();
+
 		if (periodic != null) {
 			periodic.stop();
 			periodic = null;

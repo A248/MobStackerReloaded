@@ -21,6 +21,7 @@ package space.arim.mobstacker;
 import org.bstats.bukkit.Metrics;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.ServicePriority;
@@ -53,12 +54,15 @@ public class MobStackerPlugin extends JavaPlugin {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (sender.hasPermission("mobstacker.reload")) {
 			core.reload();
-			sender.sendMessage(core.config.getString("messages.reloaded"));
+			sendMessage(sender, core.config.getString("messages.reloaded"));
 		} else {
-			sender.sendMessage(core.config.getString("messages.no-permission"));
+			sendMessage(sender, core.config.getString("messages.no-permission"));
 		}
 		return true;
-		
+	}
+	
+	private void sendMessage(CommandSender sender, String msg) {
+		sender.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
 	}
 	
 }
