@@ -251,7 +251,7 @@ public class MobStacker implements MobStackerAPI {
 	}
 	
 	void updateName(LivingEntity entity, StackInfo info) {
-		if (config.useDisplayName()) {
+		if (config.useDisplayName() && (info.getSize() != 1 || !config.getBoolean("stacking.names.disable-for-unstacked"))) {
 			entity.setCustomNameVisible(true);
 			entity.setCustomName(config.getDisplayName().replace("%SIZE%", Integer.toString(info.getSize()))
 					.replace("%HEALTH%", Double.toString(info.getHealth()))
