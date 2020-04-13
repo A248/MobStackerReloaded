@@ -102,7 +102,6 @@ public class StackListener implements Listener {
 					progeny.setCanPickupItems(entity.getCanPickupItems());
 					progeny.setCustomName(entity.getCustomName());
 					progeny.setFireTicks(entity.getFireTicks());
-					progeny.setLeashHolder(entity.getLeashHolder());
 					progeny.setMaximumAir(entity.getMaximumAir());
 					progeny.setMaximumNoDamageTicks(entity.getMaximumNoDamageTicks());
 					progeny.setNoDamageTicks(entity.getNoDamageTicks());
