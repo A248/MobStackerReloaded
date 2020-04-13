@@ -18,7 +18,6 @@
  */
 package space.arim.mobstacker.api;
 
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
 import space.arim.universal.util.AutoClosable;
@@ -32,23 +31,30 @@ import space.arim.universal.util.AutoClosable;
 public interface MobStackerAPI extends AutoClosable {
 	
 	/**
-	 * Returns the stack amount of an entity. <br>
-	 * <br>
-	 * <b>If the entity cannot be stacked</b>, <code>0</code> is returned.
+	 * Returns the stack information of an entity.
 	 * 
 	 * @param entity the entity
-	 * @return the amount
+	 * @return the stack info
 	 */
-	int getAmount(LivingEntity entity);
+	StackInfo getStackInfo(LivingEntity entity);
 	
 	/**
-	 * Updates the stack amount of an entity. <br>
-	 * If the entity cannot be stacked according to {@link #isStackable(Entity)}, nothing happens.
+	 * Updates the stack size of an entity. <br>
+	 * If the entity cannot be stacked according to {@link #isStackable(LivingEntity)}, nothing happens.
 	 * 
-	 * @param entity the entity to change 
-	 * @param amount the updated amount
+	 * @param entity the entity to change
+	 * @param size the updated size
 	 */
-	void setAmount(LivingEntity entity, int amount);
+	void setSize(LivingEntity entity, int size);
+	
+	/**
+	 * Updates the stack health of an entity. <br>
+	 * If the entity cannot be stacked according to {@link #isStackable(LivingEntity)}, nothing happens.
+	 * 
+	 * @param entity the entity to change
+	 * @param health the updated health
+	 */
+	void setHealth(LivingEntity entity, double health);
 	
 	/**
 	 * Attempts to merge an entity into surrounding entities.
@@ -76,7 +82,7 @@ public interface MobStackerAPI extends AutoClosable {
 	boolean isStackable(LivingEntity entity);
 	
 	/**
-	 * Reloads MobStacker configuration
+	 * Reloads plugin configuration (same as /mobstacker reload)
 	 * 
 	 */
 	void reload();
