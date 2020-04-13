@@ -96,9 +96,9 @@ public class MobStacker implements MobStackerAPI {
 		return () -> {
 			UUID uuid = UUIDUtil.expandAndParse(dataFile.getName());
 			try (Scanner scanner = new Scanner(dataFile, "UTF-8")) {
-				if (scanner.hasNextLine()) {
+				if (scanner.hasNext()) {
 
-					String[] data = scanner.nextLine().split("|");
+					String[] data = scanner.next().split("|");
 					StackInfoImpl stack = new StackInfoImpl(Integer.parseInt(data[0]), Double.parseDouble(data[1]));
 					stacks.merge(uuid, stack, MERGE_FUNCTION);
 				}
