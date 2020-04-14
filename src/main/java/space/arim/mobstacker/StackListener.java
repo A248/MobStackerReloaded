@@ -102,6 +102,7 @@ public class StackListener implements Listener {
 					progeny.setCanPickupItems(entity.getCanPickupItems());
 					if (!core.config.useDisplayName()) {
 						progeny.setCustomName(entity.getCustomName());
+						progeny.setCustomNameVisible(entity.isCustomNameVisible());
 					}
 					progeny.setFireTicks(entity.getFireTicks());
 					progeny.setMaximumAir(entity.getMaximumAir());
