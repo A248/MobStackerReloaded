@@ -23,7 +23,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.UUID;
@@ -66,14 +65,6 @@ public class MobStacker implements MobStackerAPI {
 
 	private StackPeriodic periodic;
 
-	/**
-	 * Used to help us load files asynchronously at startup,
-	 * <code>null</code> if we don't pass the parallelism threshold
-	 * 
-	 * To ensure that we've finished loading once server startup has completed,
-	 * we call <code>CompletableFuture.join</code> in {@link #finishLoad()}
-	 */
-	private volatile HashSet<CompletableFuture<?>> futures;
 	
 	private static final int ASYNC_IO_PARALLELISM_THRESHOLD = 10;
 
@@ -119,22 +110,35 @@ public class MobStacker implements MobStackerAPI {
 	void load() {
 		config.reload();
 		if (config.getBoolean("enable-plugin")) {
+			/*
+			 * CompletableFuture representing loading files asynchronously at startup,
+			 * remains null if we don't pass the parallelism threshold
+			 * 
+			 */
+			CompletableFuture<?> future = null;
+
 			File[] mobFiles = (new File(plugin.getDataFolder(), "mob-data")).listFiles();
 			// if the mob-data directory doesn't exist or isn't a dir, mobFiles must be null
-			if (mobFiles != null) {
+			if (mobFiles != null && mobFiles.length > 0) {
 
+				// remains null if we don't pass the parallelism threshold
+				CompletableFuture<?>[] futureFiles = null;
 				if (mobFiles.length >= ASYNC_IO_PARALLELISM_THRESHOLD) {
-					futures = new HashSet<>();
+					futureFiles = new CompletableFuture<?>[mobFiles.length];
 				}
-				for (File dataFile : mobFiles) {
+				for (int n = 0; n < mobFiles.length; n++) {
+					File dataFile = mobFiles[n];
 
 					Runnable cmd = getFileLoadAction(dataFile);
-					if (futures != null) {
-						futures.add(CompletableFuture.runAsync(cmd));
+					if (futureFiles != null) {
+						futureFiles[n] = CompletableFuture.runAsync(cmd);
 
 					} else {
 						cmd.run();
 					}
+				}
+				if (futureFiles != null) {
+					future = CompletableFuture.allOf(futureFiles);
 				}
 			}
 
@@ -145,9 +149,8 @@ public class MobStacker implements MobStackerAPI {
 				periodic.start();
 			}
 
-			if (futures != null) {
-				futures.forEach((f) -> f.join()); // await termination
-				futures = null;
+			if (future != null) {
+				future.join(); // await termination
 			}
 			logger.info("Loaded mob data files!");
 		} else {
