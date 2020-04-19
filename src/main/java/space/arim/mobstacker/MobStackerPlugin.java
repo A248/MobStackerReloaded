@@ -18,9 +18,6 @@
  */
 package space.arim.mobstacker;
 
-import org.bstats.bukkit.Metrics;
-
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -37,11 +34,7 @@ public class MobStackerPlugin extends JavaPlugin {
 	public void onEnable() {
 		core = new MobStacker(this);
 		core.load();
-		Metrics metrics = new Metrics(this, 6532);
-		if (metrics.isEnabled()) {
-			getLogger().info("Metrics enabled!");
-		}
-		Bukkit.getServicesManager().register(MobStackerAPI.class, core, this, ServicePriority.Low);
+		getServer().getServicesManager().register(MobStackerAPI.class, core, this, ServicePriority.Low);
 	}
 	
 	@Override
