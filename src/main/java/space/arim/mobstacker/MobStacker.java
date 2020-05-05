@@ -30,11 +30,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
-import org.slf4j.Logger;
-
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import space.arim.shaded.org.slf4j.Logger;
 
 import space.arim.api.util.log.LoggerConverter;
 import space.arim.api.uuid.UUIDUtil;
