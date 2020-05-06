@@ -20,15 +20,13 @@ package space.arim.mobstacker.api;
 
 import org.bukkit.entity.LivingEntity;
 
-import space.arim.universal.util.AutoClosable;
-
 /**
  * The officially supported API for interacting with MobStackerReloaded.
  * 
  * @author A248
  *
  */
-public interface MobStackerAPI extends AutoClosable {
+public interface MobStackerAPI {
 	
 	/**
 	 * Returns the stack information of an entity.

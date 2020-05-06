@@ -14,7 +14,6 @@
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     	<maven.compiler.source>1.8</maven.compiler.source>
     	<maven.compiler.target>1.8</maven.compiler.target>
-    	<core.version>0.4.5</core.version>
 		<arimapi.version>0.9.1-SNAPSHOT</arimapi.version>
     	<universal.version>0.7.0-SNAPSHOT</universal.version>
     	<spigot.version>1.8.8-R0.1-SNAPSHOT</spigot.version>
@@ -44,7 +43,7 @@
 	
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
-		<finalName>${project.name}_v${core.version}_unshaded</finalName>
+		<finalName>${project.name}_v${project.version}</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -118,10 +117,10 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
-							<outputFile>target/${project.name}_v${core.version}.jar</outputFile>
 							<artifactSet>
 								<includes>
 									<include>org.bstats:bstats-bukkit</include>
+									<include>space.arim:arimapi-util</include>
 								</includes>
 							</artifactSet>
 							<minimizeJar>true</minimizeJar>
@@ -129,6 +128,10 @@
 								<relocation>
 									<pattern>org.bstats.bukkit</pattern>
 									<shadedPattern>space.arim.mobstacker.metrics</shadedPattern>
+								</relocation>
+								<relocation>
+									<pattern>space.arim.api</pattern>
+									<shadedPattern>space.arim.mobstacker.shaded.arimapi</shadedPattern>
 								</relocation>
 							</relocations>
 						</configuration>
@@ -168,7 +171,7 @@
 		</dependency>
 		<dependency>
 			<groupId>space.arim</groupId>
-			<artifactId>arimapi-plugin</artifactId>
+			<artifactId>arimapi-util</artifactId>
 			<version>${arimapi.version}</version>
 		</dependency>
 		<dependency>

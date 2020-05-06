@@ -29,14 +29,13 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import space.arim.shaded.org.slf4j.Logger;
-
-import space.arim.api.util.log.LoggerConverter;
 import space.arim.api.uuid.UUIDUtil;
 
 import space.arim.mobstacker.api.MobStackerAPI;
@@ -78,7 +77,7 @@ public class MobStacker implements MobStackerAPI {
 	
 	MobStacker(JavaPlugin plugin) {
 		this.plugin = plugin;
-		logger = LoggerConverter.get().convert(plugin.getLogger());
+		logger = plugin.getLogger();
 		config = new StackConfig(plugin.getDataFolder());
 		listener = new StackListener(this);
 	}
@@ -94,7 +93,7 @@ public class MobStacker implements MobStackerAPI {
 					stacks.merge(uuid, stack, MERGE_FUNCTION);
 				}
 			} catch (IOException | NoSuchElementException ex) {
-				logger.warn("Error reading file " + dataFile.getPath(), ex);
+				logger.log(Level.WARNING, "Error reading file " + dataFile.getPath(), ex);
 			}
 		};
 	}
@@ -280,8 +279,7 @@ public class MobStacker implements MobStackerAPI {
 		}
 	}
 	
-	@Override
-	public void close() {
+	void close() {
 		if (periodic != null) {
 			periodic.stop();
 			periodic = null;
@@ -293,18 +291,18 @@ public class MobStacker implements MobStackerAPI {
 			stacks.forEach(ASYNC_IO_PARALLELISM_THRESHOLD, (uuid, stack) -> {
 				File dataFile = new File(mobDataFolder, uuid.toString().replace("-", ""));
 				if (dataFile.exists() && !dataFile.delete()) {
-					logger.warn("Could not override data file " + dataFile.getPath());
+					logger.warning("Could not override data file " + dataFile.getPath());
 
 				} else {
 					try (OutputStream output = new FileOutputStream(dataFile); OutputStreamWriter writer = new OutputStreamWriter(output, "UTF-8")) {
 						writer.append(Integer.toString(stack.getSize())).append('|').append(Double.toString(stack.getHealth()));
 					} catch (IOException ex) {
-						logger.warn("Could not print data to file " + dataFile.getPath() + "!", ex);
+						logger.log(Level.WARNING, "Could not print data to file " + dataFile.getPath() + "!", ex);
 					}
 				}
 			});
 		} else {
-			logger.warn("Could not create mob data directory!");
+			logger.warning("Could not create mob data directory!");
 		}
 	}
 	
