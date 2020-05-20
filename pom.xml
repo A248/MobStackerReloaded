@@ -14,7 +14,7 @@
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     	<maven.compiler.source>1.8</maven.compiler.source>
     	<maven.compiler.target>1.8</maven.compiler.target>
-		<arimapi.version>0.9.1-SNAPSHOT</arimapi.version>
+		<arimapi.version>0.10.1-SNAPSHOT</arimapi.version>
     	<universal.version>0.7.0-SNAPSHOT</universal.version>
     	<spigot.version>1.8.8-R0.1-SNAPSHOT</spigot.version>
     </properties>
@@ -71,7 +71,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.1.1</version>
+				<version>3.2.0</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
@@ -79,6 +79,10 @@
 							<goal>javadoc</goal>
 							<goal>jar</goal>
 						</goals>
+						<configuration>
+							<source>1.8</source>
+							<target>1.8</target>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
