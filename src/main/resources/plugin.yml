@@ -3,7 +3,6 @@ main: ${project.groupId}.mobstacker.MobStackerPlugin
 version: ${project.version}
 author: A248
 description: ${project.description}
-depend: [ArimAPI]
 
 commands:
   mobstacker:
