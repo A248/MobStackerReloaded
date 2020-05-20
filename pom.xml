@@ -5,7 +5,7 @@
 	
 	<groupId>space.arim</groupId>
 	<artifactId>mobstacker</artifactId>
-	<version>0.4.5-SNAPSHOT</version>
+	<version>0.4.6-SNAPSHOT</version>
 	
 	<name>MobStackerReloaded</name>
 	<description>Lightweight entity-stacking plugin for Spigot servers.</description>
